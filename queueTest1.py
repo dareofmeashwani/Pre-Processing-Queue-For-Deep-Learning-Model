@@ -1,5 +1,5 @@
-import DataQueue
 import DataGenerator
+import DataQueue
 
 if __name__ == "__main__":
     path = "ExampleData/flowerDataset"

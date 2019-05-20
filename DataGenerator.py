@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 import os
 import random
+import h5py
 
 
 def read_image(filename):
@@ -120,4 +121,41 @@ class CatzGenerator:
                 temp.append(normalize(read_image(path + str(i) + '.jpg')))
             Y.append(normalize(read_image(path + 'result.jpg')))
             X.append(np.array(temp))
+        return np.array(X), np.array(Y)
+
+
+class CocoGenerator:
+    def __init__(self, path, batchSize=64, imageSize=64):
+        self.__path = path
+        self.batchSize = batchSize
+        self.imageSize = imageSize
+
+    def init(self):
+        trainFilePath = os.path.join(os.path.join(self.__path, 'imageLists'), 'train.txt')
+        self.imagesDir = os.path.join(self.__path, 'images')
+        self.annotationsDir = os.path.join(self.__path, 'annotations')
+        trainFileReader = open(trainFilePath, 'r')
+        self.trainFilesList = [line.replace('\n', '') for line in trainFileReader.readlines()]
+
+    # compulsary & run seguentially just to create a job
+    def batchGenerator(self):
+        itemIndex = random.sample(range(0, len(self.trainFilesList)), self.batchSize)
+        result = []
+        for i in itemIndex:
+            result.append(self.trainFilesList[i])
+        return result
+
+    # compulsary & run in parallell among multiple Processor, Each processor execute a 1 job
+    def batchProcessor(self, filenames):
+        X = []
+        Y = []
+        for filename in filenames:
+            img = read_image(os.path.join(self.imagesDir, filename + '.jpg'))
+            img = resize_image(img, self.imageSize, self.imageSize)
+            img = normalize(img)
+            if len(img.shape) == 2:
+                img = np.pad(img.reshape((self.imageSize, self.imageSize, 1)), [(0, 0), (0, 0), (0, 2)],
+                             mode='constant', constant_values=0)
+            X.append(img)
+            Y.append(h5py.File(os.path.join(self.annotationsDir, filename + '.mat'), 'r'))
         return np.array(X), np.array(Y)
