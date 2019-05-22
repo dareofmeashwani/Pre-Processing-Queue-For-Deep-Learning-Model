@@ -1,9 +1,11 @@
+import sys
+sys.path.insert(0,'../')
 import DataGenerator
 import DataQueue
 
 if __name__ == "__main__":
-    path = "F:\coco"
-    generator = DataGenerator.CocoGenerator(path, batchSize=64)
+    path = "../ExampleData/catzDataset"
+    generator = DataGenerator.CatzGenerator(path, batchSize=16)
     q = DataQueue.DataQueue(generator, size=16, childCount=4)
     q.start()
     for i in range(10):

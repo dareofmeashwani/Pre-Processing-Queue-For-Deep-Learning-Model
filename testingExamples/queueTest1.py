@@ -1,8 +1,10 @@
+import sys
+sys.path.insert(0,'../')
 import DataGenerator
 import DataQueue
 
 if __name__ == "__main__":
-    path = "ExampleData/flowerDataset"
+    path = "../ExampleData/flowerDataset"
     generator = DataGenerator.ClassificationImageGenerator(path, batchSize=64)
     q = DataQueue.DataQueue(generator, size=16, childCount=4)
     q.start()
