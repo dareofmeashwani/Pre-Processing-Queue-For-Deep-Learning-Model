@@ -35,7 +35,7 @@ class DataQueue:
             batchSM['emptySemaphore'].release()
 
     def getBatch(self):
-        if self.__status.value:
+        if self.__status.value and self.__batchSM['q'].qsize() != 0 and self.__inputSM['q'].qsize() != 0:
             self.__batchSM['emptySemaphore'].acquire()
             self.__batchSM['mutex'].acquire()
             batch = self.__batchSM['q'].get()
